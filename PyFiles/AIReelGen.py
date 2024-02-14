@@ -13,6 +13,8 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 import os
 from datetime import datetime
 import shutil
+import subprocess
+
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -80,11 +82,13 @@ def extract_audio(video_file, project_id):
 # In[5]:
 
 
-def generate_video_w(video_file, project_id):
+def generate_video_w(project_id):
     
     """Function to create a video with 1080 px width and n height"""
     
     try:
+        # Path to input video
+        video_file = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
         # Saving the audio of video as mp3
         extract_audio(video_file, project_id)
         
@@ -355,63 +359,15 @@ def add_audio_to_final_video(project_id):
     return 200
 
 
-# In[32]:
-
-
-def allowed_file(filename):
-    ALLOWED_EXTENSIONS = {'jpg', 'png'}
-
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def input_file_path_returner(project_id):
-
-    project_input_folder_path = f'../Output Files/{project_id}/Input Files'
-
-    input_file_name = os.listdir(project_input_folder_path)[0]
-
-    input_file_path = os.path.join(project_input_folder_path, input_file_name)
-
-    return input_file_path
-
-def copy_video_to_project_folder(project_id):
-    source_path = "C:\\Users\\mnsnn\\Downloads\\fI3Gz5m0yzwgUSJA.mp4"
-    destination_folder = f'../Output Files/{project_id}/Input Files'
-    
-    # Create the destination folder if it doesn't exist
-    os.makedirs(destination_folder, exist_ok=True)
-    
-    # Define the destination path
-    destination_path = os.path.join(destination_folder, 'fI3Gz5m0yzwgUSJA.mp4')
-    
-    # Copy the video to the destination folder
-    shutil.copy2(source_path, destination_path)
-
-    return 100
-
-# In[10]:
-
-
-def generate_reel(video_file, text):
-    
+def download_twitter_video(tweet_link, project_id):
     try:
-        project_id = create_project()
-
-        project_creation_status = create_project_folder(project_id)
-    
-        w_gen_status = generate_video_w(video_file, project_id)
-
-        img_gen_status = generate_header_image(text, project_id)
-
-        combine_status = combine_img_vid(project_id)
-
-        reel_gen_status = generate_final_video(project_id)
+        twdl_py_path = "../twitter-video-dl/twitter-video-dl.py"
+        save_file_name = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
+        command = ["python", twdl_py_path, tweet_link, save_file_name]
+        subprocess.run(command)
+        status = 200
+    except:
+        status = 400
         
-        audio_video_status = add_audio_to_final_video(project_id)
-        
-        return project_id, 200
-        
-    except Exception as e:
-        
-        return None, 401
+    return status
 
