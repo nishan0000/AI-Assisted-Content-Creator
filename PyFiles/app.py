@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import AIReelGen
+import AIReelGen, HooklineGen
 
 app = Flask(__name__)
 
@@ -8,7 +8,14 @@ def create_reel():
 
     try:
         data = request.get_json()  # Get JSON data sent in the POST request
-        text = data.get('text', '')  # Get the 'text' field from the JSON data
+        tweet_link = data.get('url', '')
+        text = data.get('text', '')
+
+        if text == None:
+            # Generating hookline using AI (Gemini API)
+            text = HooklineGen.return_hookline(tweet_link)
+        else:
+            pass
 
         # Creating project_id
         project_id = AIReelGen.create_project()
@@ -17,13 +24,10 @@ def create_reel():
         project_creation_status = AIReelGen.create_project_folder(project_id)
 
         # Downloading and saving the video to specified directory (This should be changed with download code later)
-        video_download_status = AIReelGen.copy_video_to_project_folder(project_id)
-
-        # Returning the path to mp4 file
-        input_video_path = AIReelGen.input_file_path_returner(project_id)
+        video_download_status = AIReelGen.download_twitter_video(tweet_link, project_id)
 
         # Generating initial video with small banner added to left and right : 14px
-        w_gen_status = AIReelGen.generate_video_w(input_video_path, project_id)
+        w_gen_status = AIReelGen.generate_video_w(project_id)
 
         # Generating the image with text added
         img_gen_status = AIReelGen.generate_header_image(text, project_id)
@@ -40,7 +44,8 @@ def create_reel():
         # Success status
         completion_status = 'Completed'
 
-    except:
+    except Exception as e:
+        print(e)
         # Failure Status
         completion_status = 'Failed'
 
