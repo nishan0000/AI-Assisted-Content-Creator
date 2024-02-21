@@ -6,6 +6,7 @@
 
 import sys
 sys.path.append('../Output Files')
+sys.path.append('../PyFiles')
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -19,10 +20,7 @@ import subprocess
 import warnings
 warnings.filterwarnings('ignore')
 
-
-# ### Project Initiation
-
-# In[2]:
+import configs as cf
 
 
 def create_project():
@@ -46,7 +44,7 @@ def create_project():
 
 def create_project_folder(project_id):
     
-    output_folder_path = '..\\Output Files'
+    output_folder_path = os.path.join(cf.FILE_PATH, cf.output_files)
     project_output_folder_path = os.path.join(output_folder_path, project_id)    
     if not os.path.exists(project_output_folder_path):
         os.mkdir(project_output_folder_path)
@@ -71,7 +69,8 @@ def extract_audio(video_file, project_id):
         audio = clip.audio
 
         # save audio as mp3
-        audio.write_audiofile(f'../Output Files/{project_id}/Audio.mp3')
+#         audio.write_audiofile(f'../Output Files/{project_id}/Audio.mp3')
+        audio.write_audiofile(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Audio.mp3'))
 
         return 200
 
@@ -88,7 +87,8 @@ def generate_video_w(project_id):
     
     try:
         # Path to input video
-        video_file = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
+#         video_file = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
+        video_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, cf.input_files, 'Input_Video.mp4')
         # Saving the audio of video as mp3
         extract_audio(video_file, project_id)
         
@@ -102,7 +102,9 @@ def generate_video_w(project_id):
 
         # create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(f'../Output Files/{project_id}/Bardotics W Video.mp4', fourcc, fps, (1080, height))
+        
+#         out = cv2.VideoWriter(f'../Output Files/{project_id}/Bardotics W Video.mp4', fourcc, fps, (1080, height))
+        out = cv2.VideoWriter(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics W Video.mp4'), fourcc, fps, (1080, height))
 
         while(cap.isOpened()):
             ret, frame = cap.read()
@@ -146,13 +148,15 @@ def generate_header_image(text, project_id):
     try:
     
         # Load the image
-        image_path = r"../Hardcodes/Templates/Bardotics header.png"  # Replace with the path to your image file
+#         image_path = r"../Hardcodes/Templates/Bardotics header.png"  # Replace with the path to your image file
+        image_path = os.path.join(cf.FILE_PATH, cf.templates_path, 'Bardotics header.png')
 
 
         background = Image.open(image_path)
 
         # Load the font
-        font_path = r"../Hardcodes\Fonts\GothamBook.ttf"  # Replace with the path to your Gotham font file
+#         font_path = r"../Hardcodes\Fonts\GothamBook.ttf"  # Replace with the path to your Gotham font file
+        font_path = os.path.join(cf.FILE_PATH, cf.fonts_path, 'GothamBook.ttf')
         font_size = 35
         font = ImageFont.truetype(font_path, int(font_size))
 
@@ -209,7 +213,8 @@ def generate_header_image(text, project_id):
         background = background.crop((0, 0, background.width, cutting_px))
 
         # Save the image
-        background.save(f'../Output Files/{project_id}/Bardotics H Img.png')
+#         background.save(f'../Output Files/{project_id}/Bardotics H Img.png')
+        background.save(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics H Img.png'))
         
         return 200
     except Exception as e:
@@ -226,10 +231,12 @@ def combine_img_vid(project_id):
     try:
 
         # specify video file path
-        video_file = f"../Output Files/{project_id}/Bardotics W Video.mp4"
+#         video_file = f"../Output Files/{project_id}/Bardotics W Video.mp4"
+        video_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics W Video.mp4')
 
         # specify image file path
-        image_file = f"../Output Files/{project_id}/Bardotics H Img.png"
+#         image_file = f"../Output Files/{project_id}/Bardotics H Img.png"
+        image_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics H Img.png')
 
         # load video
         cap = cv2.VideoCapture(video_file)
@@ -247,8 +254,9 @@ def combine_img_vid(project_id):
 
         # create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(fr"../Output Files/{project_id}/Bardotics Combined Video.mp4", fourcc, fps, (width, height + image.shape[0]))
-
+#         out = cv2.VideoWriter(fr"../Output Files/{project_id}/Bardotics Combined Video.mp4", fourcc, fps, (width, height + image.shape[0]))
+        out = cv2.VideoWriter(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics Combined Video.mp4'), fourcc, fps, (width, height + image.shape[0]))
+        
         while(cap.isOpened()):
             ret, frame = cap.read()
             if ret:
@@ -284,7 +292,8 @@ def generate_final_video(project_id):
 
     try:
         # specify video file path
-        video_file = fr"../Output Files/{project_id}/Bardotics Combined Video.mp4"
+#         video_file = fr"../Output Files/{project_id}/Bardotics Combined Video.mp4"
+        video_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics Combined Video.mp4')
 
         # load video
         cap = cv2.VideoCapture(video_file)
@@ -299,7 +308,8 @@ def generate_final_video(project_id):
 
         # create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(fr"../Output Files/{project_id}/Bardotics Reel.mp4", fourcc, fps, (1080, 1920))
+#         out = cv2.VideoWriter(fr"../Output Files/{project_id}/Bardotics Reel.mp4", fourcc, fps, (1080, 1920))
+        out = cv2.VideoWriter(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics Reel.mp4'), fourcc, fps, (1080, 1920))
 
         while(cap.isOpened()):
             ret, frame = cap.read()
@@ -333,8 +343,10 @@ def generate_final_video(project_id):
 def add_audio_to_final_video(project_id):
     """Function to add an audio track to a video file"""
     
-    audio_file = f'../Output Files/{project_id}/Audio.mp3'
-    video_file = f'../Output Files/{project_id}/Bardotics Reel.mp4'
+#     audio_file = f'../Output Files/{project_id}/Audio.mp3'
+    audio_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Audio.mp3')
+#     video_file = f'../Output Files/{project_id}/Bardotics Reel.mp4'
+    video_file = os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics Reel.mp4')
     
     if os.path.exists(audio_file):
         try:
@@ -350,6 +362,8 @@ def add_audio_to_final_video(project_id):
 
             # save video with new audio
             video_with_audio.write_videofile(f'../Output Files/{project_id}/Bardotics Reel Final.mp4', codec='libx264')
+            video_with_audio.write_videofile(os.path.join(cf.FILE_PATH, cf.output_files, project_id, 'Bardotics Reel.mp4'), codec='libx264')
+            
 
 
         except Exception as e:
@@ -361,8 +375,10 @@ def add_audio_to_final_video(project_id):
 
 def download_twitter_video(tweet_link, project_id):
     try:
-        twdl_py_path = "../twitter-video-dl/twitter-video-dl.py"
-        save_file_name = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
+#         twdl_py_path = "../twitter-video-dl/twitter-video-dl.py"
+        twdl_py_path = os.path.join(cf.FILE_PATH, cf.twdl_path, 'twitter-video-dl.py')
+#         save_file_name = f'../Output Files/{project_id}/Input Files/Input_Video.mp4'
+        save_file_name = os.path.join(cf.FILE_PATH, cf.output_files, project_id, cf.input_files, 'Input_Video.mp4')
         command = ["python", twdl_py_path, tweet_link, save_file_name]
         subprocess.run(command)
         status = 200
