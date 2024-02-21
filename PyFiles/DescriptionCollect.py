@@ -4,11 +4,13 @@
 # In[8]:
 
 
+
 import requests
 import json
 import re
 import urllib.parse
 import os
+import configs as cf
 
 
 # In[9]:
@@ -17,6 +19,8 @@ import os
 # Define the path to your JSON file here. 
 # For example, if your JSON file is in the same directory as your notebook, just use the file name.
 json_file_path = r"C:\Users\mnsnn\Documents\AI\AI Assisted Reels Generator\AI-Assisted-Content-Creator\twitter-video-dl\src\twitter_video_dl\RequestDetails.json"
+
+json_file_path = os.path.join(cf.FILE_PATH, cf.twdl_path, cf.rqdetails_json_path)
 
 """
 Hey, thanks for reading the comments.  I love you.
@@ -181,10 +185,14 @@ def get_description_details(tweet_url, guest_token, bearer_token):
     
     tweet_details = get_tweet_details(tweet_url, guest_token, bearer_token)
     tweet_json = tweet_details.json()
+
+    # Collecting the tweet description
     tweet_description = tweet_json['data']['tweetResult']['result']['legacy']['full_text']
-#     des = '.'.join(tweet_description.replace(' \n\n', '').split('.\n\n')[:-1]).replace('.', '. ')
     
-    return tweet_description
+    # Collecting the profile name for credits
+    profile_name = tweet_json['data']['tweetResult']['result']['core']['user_results']['result']['legacy']['screen_name']
+    
+    return profile_name, tweet_description
 
 
 # In[20]:
@@ -194,9 +202,9 @@ def get_description(tweet_url):
     
     bearer_token, guest_token = get_tokens(tweet_url)
     
-    description = get_description_details(tweet_url, guest_token, bearer_token)
+    profile_name, tweet_description = get_description_details(tweet_url, guest_token, bearer_token)
     
-    return description
+    return profile_name, tweet_description
 
 
 
