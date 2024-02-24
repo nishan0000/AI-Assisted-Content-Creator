@@ -42,12 +42,15 @@ def create_reel():
 
         # Adding audio to the created video
         audio_video_status = AIReelGen.add_audio_to_final_video(project_id)
+        
+        # Clearing the directory
+        AIReelGen.clear_directory(project_id)
 
         # Success status
         completion_status = 'Completed'
 
     except Exception as e:
-        print(e)
+        
         # Failure Status
         completion_status = 'Failed'
 
@@ -60,7 +63,6 @@ def download_file():
     if project_id is None:
         return "Error: No project_id field provided. Please specify a project_id."
 
-#     file_path = os.path.join('..', 'Output Files', str(project_id), 'Bardotics Reel Final.mp4')
     file_path = os.path.join(cf.FILE_PATH, cf.output_files, str(project_id), 'Bardotics Reel Final.mp4')
     try:
         return send_file(file_path, as_attachment=True)
