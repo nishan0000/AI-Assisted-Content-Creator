@@ -21,6 +21,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import configs as cf
+import TextGen
 
 
 def create_project():
@@ -401,3 +402,43 @@ def clear_directory(project_id):
                 os.remove(file_path)
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
+
+def create_reel(tweet_link, text):
+
+    if text == None:
+        # Generating hookline using AI (Gemini API)
+        text, caption = TextGen.generate_text_using_ai(tweet_link)
+    else:
+        pass
+
+    # Creating project_id
+    project_id = create_project()
+
+    # Creating project
+    project_creation_status = create_project_folder(project_id)
+
+    # Downloading and saving the video to specified directory (This should be changed with download code later)
+    video_download_status = download_twitter_video(tweet_link, project_id)
+
+    # Generating initial video with small banner added to left and right : 14px
+    w_gen_status = generate_video_w(project_id)
+
+    # Generating the image with text added
+    img_gen_status = generate_header_image(text, project_id)
+
+    # Combining the image and video together
+    combine_status = combine_img_vid(project_id)
+
+    # Generating Reel
+    reel_gen_status = generate_final_video(project_id)
+
+    # Adding audio to the created video
+    audio_video_status = add_audio_to_final_video(project_id)
+
+    # Clearing the directory
+#         AIReelGen.clear_directory(project_id)
+
+    # Success status
+    completion_status = 'Completed'
+
+    return caption, completion_status, project_id
