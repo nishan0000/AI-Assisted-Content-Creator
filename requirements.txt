@@ -1,0 +1,9 @@
+flask
+langchain
+langchain_google_genai==0.0.6
+opencv-python
+python-dotenv==1.0.1
+pillow==9.4.0
+google-generativeai
+moviepy==1.0.3
+requests
